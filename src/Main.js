@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { ReactDOM } from "react";
-import { Navbar, Nav, Container, Form, FormControl, Card } from "react-bootstrap"
+import { Navbar, Nav, Container, Form, FormControl, Card,Row } from "react-bootstrap"
 import { FaHome, FaCloudDownloadAlt } from 'react-icons/fa';
 import { TiFlowMerge } from 'react-icons/ti'
 import { Draggable, Droppable, DragDropContext } from "react-beautiful-dnd";
@@ -135,14 +135,15 @@ function App() {
             <Card.Title>generador gráfico</Card.Title>
             <DragDropContext onDragEnd={onDragEnd}>
               <Container>
-                {state.columnOrder.map(columnId => {
-                  const column = state.columns[columnId];
-                  const tags = column.tagIds.map(
-                    tagId => state.tags[tagId],
-                  );
-
-                  return <Column key={column.id} column={column} tags={tags} />;
-                })}
+                <Row>
+                  {state.columnOrder.map(columnId => {
+                    const column = state.columns[columnId];
+                    const tags = column.tagIds.map(
+                      tagId => state.tags[tagId],
+                    );
+                    return <Column key={column.id} column={column} tags={tags} widthColumn={column.widthColumn} />;
+                  })}
+                </Row>
               </Container>
             </DragDropContext>
           </Card.Body>
