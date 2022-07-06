@@ -1,12 +1,32 @@
-import React, { useEffect } from "react";
-import { Navbar, Nav, Container, Form, FormControl,Card } from "react-bootstrap"
+import React, { useState } from "react";
+import { Navbar, Nav, Container, Form, FormControl, Card } from "react-bootstrap"
 import { FaHome, FaCloudDownloadAlt } from 'react-icons/fa';
 import { TiFlowMerge } from 'react-icons/ti'
+import { Draggable, Droppable, DragDropContext } from "react-beautiful-dnd";
+import './flowProtocol.css'
+
+const tags = [
+  {
+    id: "0",
+    name: "Tipo de orden"
+  },
+  {
+    id: "1",
+    name: "Pasos"
+  }
+]
+
+const reorder = (list, startIndex, endIndex) => {
+  const result = [...list];
+  const [removed] = result.splice(startIndex, 1);
+  result.splice(endIndex, 0, removed);
+
+  return result;
+};
 
 function App() {
 
-  useEffect(() => {
-  }, []);
+  const [fpTags, setFpTags] = useState(tags)
 
   return (
     <React.Fragment>
@@ -59,8 +79,37 @@ function App() {
           </Card.Header>
           <Card.Body>
             <Card.Title>generador gráfico</Card.Title>
-            
-            
+            <DragDropContext onDragEnd={(result) => {
+              const {source,destination} = result;
+              if(!destination){
+                return;
+              }
+              if(source.index === destination.index && source.droppableId === destination.droppableId){
+                return;
+              }
+              
+              setFpTags(prevTags => reorder(prevTags,source.index,destination.index))
+
+            }}>
+              <div className="flowProtocolApp">
+                <Droppable droppableId="tags">
+                  {(droppableProvided) => (
+                    <ul {...droppableProvided.droppableProps} ref={droppableProvided.innerRef} className="tag-container">
+                      {fpTags.map((tag, index) =>
+                      (
+                        <Draggable key={tag.id} draggableId={tag.id} index={index}>
+                          {(draggableProvided) => (<li {...draggableProvided.draggableProps} 
+                          ref={draggableProvided.innerRef}
+                          {...draggableProvided.dragHandleProps}
+                          className="tag-item">{tag.name}</li>)}
+                        </Draggable>
+                      ))}
+                      {droppableProvided.placeholder}
+                    </ul>
+                  )}
+                </Droppable>
+              </div>
+            </DragDropContext>
           </Card.Body>
         </Card>
       </Container>
