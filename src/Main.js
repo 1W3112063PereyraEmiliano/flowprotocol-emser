@@ -1,32 +1,86 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { ReactDOM } from "react";
 import { Navbar, Nav, Container, Form, FormControl, Card } from "react-bootstrap"
 import { FaHome, FaCloudDownloadAlt } from 'react-icons/fa';
 import { TiFlowMerge } from 'react-icons/ti'
 import { Draggable, Droppable, DragDropContext } from "react-beautiful-dnd";
 import './flowProtocol.css'
 
-const tags = [
-  {
-    id: "0",
-    name: "Tipo de orden"
-  },
-  {
-    id: "1",
-    name: "Pasos"
-  }
-]
-
-const reorder = (list, startIndex, endIndex) => {
-  const result = [...list];
-  const [removed] = result.splice(startIndex, 1);
-  result.splice(endIndex, 0, removed);
-
-  return result;
-};
+import initialData from './initial-data';
+import Column from './column';
 
 function App() {
 
-  const [fpTags, setFpTags] = useState(tags)
+  const [state, setState] = useState(initialData)
+
+  const onDragEnd = result => {
+    const { destination, source, draggableId } = result;
+
+    if (!destination) {
+      return;
+    }
+
+    if (
+      destination.droppableId === source.droppableId &&
+      destination.index === source.index
+    ) {
+      return;
+    }
+
+    const start = state.columns[source.droppableId];
+    const finish = state.columns[destination.droppableId];
+
+    if (start === finish) {
+      const newTagIds = Array.from(start.tagIds);
+      newTagIds.splice(source.index, 1);
+      newTagIds.splice(destination.index, 0, draggableId);
+
+      const newColumn = {
+        ...start,
+        tagIds: newTagIds,
+      };
+
+      const newState = {
+        ...state,
+        columns: {
+          ...state.columns,
+          [newColumn.id]: newColumn,
+        },
+      };
+
+      setState(newState);
+      return;
+    }
+
+    // Moving from one list to another
+    const startTagIds = Array.from(start.tagIds);
+    startTagIds.splice(source.index, 1);
+    const newStart = {
+      ...start,
+      tagIds: startTagIds,
+    };
+
+    const finishTagIds = Array.from(finish.tagIds);
+    finishTagIds.splice(destination.index, 0, draggableId);
+    const newFinish = {
+      ...finish,
+      tagIds: finishTagIds,
+    };
+
+    const newState = {
+      ...state,
+      columns: {
+        ...state.columns,
+        [newStart.id]: newStart,
+        [newFinish.id]: newFinish,
+      },
+    };
+    setState(newState);
+  };
+
+  useEffect(() => {
+
+  }, [state])
 
   return (
     <React.Fragment>
@@ -79,36 +133,17 @@ function App() {
           </Card.Header>
           <Card.Body>
             <Card.Title>generador gráfico</Card.Title>
-            <DragDropContext onDragEnd={(result) => {
-              const {source,destination} = result;
-              if(!destination){
-                return;
-              }
-              if(source.index === destination.index && source.droppableId === destination.droppableId){
-                return;
-              }
-              
-              setFpTags(prevTags => reorder(prevTags,source.index,destination.index))
+            <DragDropContext onDragEnd={onDragEnd}>
+              <Container>
+                {state.columnOrder.map(columnId => {
+                  const column = state.columns[columnId];
+                  const tags = column.tagIds.map(
+                    tagId => state.tags[tagId],
+                  );
 
-            }}>
-              <div className="flowProtocolApp">
-                <Droppable droppableId="tags">
-                  {(droppableProvided) => (
-                    <ul {...droppableProvided.droppableProps} ref={droppableProvided.innerRef} className="tag-container">
-                      {fpTags.map((tag, index) =>
-                      (
-                        <Draggable key={tag.id} draggableId={tag.id} index={index}>
-                          {(draggableProvided) => (<li {...draggableProvided.draggableProps} 
-                          ref={draggableProvided.innerRef}
-                          {...draggableProvided.dragHandleProps}
-                          className="tag-item">{tag.name}</li>)}
-                        </Draggable>
-                      ))}
-                      {droppableProvided.placeholder}
-                    </ul>
-                  )}
-                </Droppable>
-              </div>
+                  return <Column key={column.id} column={column} tags={tags} />;
+                })}
+              </Container>
             </DragDropContext>
           </Card.Body>
         </Card>
