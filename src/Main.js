@@ -1,15 +1,38 @@
 import React, { useState, useEffect } from "react";
-import { ReactDOM } from "react";
-import { Navbar, Nav, Container, Form, FormControl, Card,Row } from "react-bootstrap"
-import { FaHome, FaCloudDownloadAlt } from 'react-icons/fa';
+import { Navbar, Nav, Container, Form, FormControl, Card, Row } from "react-bootstrap"
+import { FaHome, FaCloudDownloadAlt, FaLanguage } from 'react-icons/fa';
 import { TiFlowMerge } from 'react-icons/ti'
-import { Draggable, Droppable, DragDropContext } from "react-beautiful-dnd";
+import { DragDropContext } from "react-beautiful-dnd";
 import './flowProtocol.css'
-
+import Typical from 'react-typical'
 import initialData from './initial-data';
 import Column from './column';
+import styled from 'styled-components';
 
 function App() {
+  
+  const [xmlText, setXmlText] = useState('')
+
+  const ContainerBeauty = styled.div`
+  margin: 8px;
+  border: 1px solid lightgrey;
+  border-radius: 2px;
+  display: flex;
+  flex-direction: column;
+  width:96.4%
+`;
+
+  const TitleBeauty = styled.h6`
+  padding: 8px;
+  color: grey;
+`;
+
+  const TextEntryBeauty = styled.div`
+  padding: 8px;
+  background-color:'white';
+  flex-grow: 1;
+  min-height: 100px;
+`;
 
   const [state, setState] = useState(initialData)
 
@@ -76,6 +99,29 @@ function App() {
       },
     };
     setState(newState);
+
+    let str = ''
+
+    Object.entries(newState.columns).forEach(([key, value]) => {
+
+      if (key !== 'column-1') {
+
+        value.tagIds.map((tagName) => {
+
+          Object.entries(state.tags).forEach(([key, value]) => {
+            if (value.id === tagName) {
+
+              str += value.xml
+
+            }
+          });
+
+        })
+      }
+    });
+
+    setXmlText(str)
+
   };
 
   useEffect(() => {
@@ -143,6 +189,19 @@ function App() {
                     );
                     return <Column key={column.id} column={column} tags={tags} widthColumn={column.widthColumn} />;
                   })}
+                </Row>
+                <Row>
+                  <ContainerBeauty>
+                    <TitleBeauty><FaLanguage size="15px" className="me-2"></FaLanguage>vizualizador xml</TitleBeauty>
+                    <TextEntryBeauty>
+                      <Typical
+                        steps={[xmlText, 50]}
+                        loop={1}
+                        wrapper="p"
+                      >
+                      </Typical>
+                    </TextEntryBeauty>
+                  </ContainerBeauty>
                 </Row>
               </Container>
             </DragDropContext>

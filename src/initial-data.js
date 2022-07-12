@@ -1,9 +1,10 @@
-import { FaPencilRuler, FaTags, FaJava, FaLanguage } from "react-icons/fa";
+import { FaPencilRuler, FaTags } from "react-icons/fa";
+import xmlSentences from "./xmlSentences";
 
 const initialData = {
     tags: {
-      'tag-1': { id: 'tag-1', content: 'tipo de orden' },
-      'tag-2': { id: 'tag-2', content: 'pasos' },
+      'tag-1': { id: 'tag-1', content: 'tipo de orden',xml: xmlSentences.tipoOrden },
+      'tag-2': { id: 'tag-2', content: 'pasos',xml: xmlSentences.pasos },
     },
     columns: {
       'column-1': {
@@ -17,18 +18,11 @@ const initialData = {
         id: 'column-2',
         title: 'visualizador gráfico',
         tagIds: [],
-        widthColumn: '40%',
+        widthColumn: '75%',
         icon: <FaPencilRuler size="15px" className="me-2"></FaPencilRuler>
-      },
-      'column-3': {
-        id: 'column-3',
-        title: 'visualizador XML',
-        tagIds: [],
-        widthColumn: '35%',
-        icon: <FaLanguage size="15px" className="me-2"></FaLanguage>
       }
     },
-    columnOrder: ['column-1', 'column-2', 'column-3'],
+    columnOrder: ['column-1', 'column-2'],
   };
   
   export default initialData;
