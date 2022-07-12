@@ -190,6 +190,9 @@ function App() {
                     return <Column key={column.id} column={column} tags={tags} widthColumn={column.widthColumn} />;
                   })}
                 </Row>
+              </Container>
+            </DragDropContext>
+            <Container>
                 <Row>
                   <ContainerBeauty>
                     <TitleBeauty><FaLanguage size="15px" className="me-2"></FaLanguage>vizualizador xml</TitleBeauty>
@@ -203,8 +206,7 @@ function App() {
                     </TextEntryBeauty>
                   </ContainerBeauty>
                 </Row>
-              </Container>
-            </DragDropContext>
+            </Container>
           </Card.Body>
         </Card>
       </Container>
